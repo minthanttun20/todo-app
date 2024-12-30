@@ -4,9 +4,13 @@ This is a simple and interactive To-Do application built using React. It allows 
 
 ## Features
 Add Tasks: Add new tasks to your list.
+
 Mark as Complete: Mark tasks as completed with a single click.
+
 Delete Tasks: Remove tasks from the list.
+
 Filter Tasks: Filter tasks by:
+
 All Tasks
 Important Tasks
 Completed Tasks
