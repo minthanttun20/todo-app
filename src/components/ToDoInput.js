@@ -1,16 +1,18 @@
 import { useContext, useState } from 'react';
 import { FaPlus } from 'react-icons/fa';
-import { GlobalContext } from '../context/GlobalState';
+// import { GlobalContext } from '../context/GlobalState';
+import { auth, db } from '../firebase';
+import { addDoc, collection, doc, Timestamp } from 'firebase/firestore';
 
 
 const ToDoInput = () => {
-    const { addTask } = useContext(GlobalContext);
+    // const { addTask } = useContext(GlobalContext);
 
     const [task, setTask] = useState('');
     const [showAlert, setShowAlert] = useState(false);
     const [succeedMsg, setSucceedMsg] = useState(false);
     
-    function onSubmit(e) {
+    async function onSubmit(e) {
         e.preventDefault();
 
         if(task === '') {
@@ -23,12 +25,33 @@ const ToDoInput = () => {
             return
         }
 
-        const newTask = {
-            id: Math.floor(Math.random() * 10000000),
-            task: task,
-            isCompleted: false
+        // *** For GlobalContext ***
+        // const newTask = {
+        //     id: Math.floor(Math.random() * 10000000),
+        //     task: task,
+        //     isCompleted: false,
+        //     userId: user.uid
+        // }
+        // addTask(newTask);
+
+        try {
+            // Get current user 
+            const user = auth.currentUser;  
+            if(user) {
+                await addDoc(collection(db, "Tasks"), {
+                    task,
+                    isCompleted: false,
+                    isImportant: false,
+                    date: Timestamp.now(),
+                    userId: user.uid,
+                });
+                console.log("Task added successfully");
+            } else {
+                console.log("User is not authenticated");
+            }
+        } catch (error) {
+            console.log(error);
         }
-        addTask(newTask);
 
         setTask(''); // Clear the input field
         setSucceedMsg(true);
@@ -49,7 +72,7 @@ const ToDoInput = () => {
             value={task}
             className="flex-grow px-4 py-2 border border-gray-700 rounded-md focus:outline-none w-3/4 sm:w-2/3 lg:w-1/3"
             />
-            <button className="p-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+            <button className="p-2 bg-indigo-600  text-white rounded-md hover:bg-indigo-500">
                 <FaPlus />
             </button>
         </form>
